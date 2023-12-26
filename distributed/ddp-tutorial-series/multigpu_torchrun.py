@@ -10,9 +10,9 @@ from torch.distributed import init_process_group, destroy_process_group
 import os
 
 
-def ddp_setup():
+def ddp_setup(local_rank):
     init_process_group(backend="nccl")
-    torch.cuda.set_device(int(os.environ["LOCAL_RANK"]))
+    torch.cuda.set_device(local_rank)
 
 class Trainer:
     def __init__(
@@ -20,10 +20,11 @@ class Trainer:
         model: torch.nn.Module,
         train_data: DataLoader,
         optimizer: torch.optim.Optimizer,
+        local_rank: int,
         save_every: int,
         snapshot_path: str,
     ) -> None:
-        self.gpu_id = int(os.environ["LOCAL_RANK"])
+        self.gpu_id = local_rank
         self.model = model.to(self.gpu_id)
         self.train_data = train_data
         self.optimizer = optimizer
@@ -90,14 +91,19 @@ def prepare_dataloader(dataset: Dataset, batch_size: int):
         sampler=DistributedSampler(dataset)
     )
 
+def post_training():
+    print("===after training, lets do post processing====")
 
 def main(save_every: int, total_epochs: int, batch_size: int, snapshot_path: str = "snapshot.pt"):
-    ddp_setup()
+    local_rank = int(os.environ["LOCAL_RANK"])
+    ddp_setup(local_rank)
     dataset, model, optimizer = load_train_objs()
     train_data = prepare_dataloader(dataset, batch_size)
     trainer = Trainer(model, train_data, optimizer, save_every, snapshot_path)
     trainer.train(total_epochs)
     destroy_process_group()
+    if local_rank == 0:
+        post_training()
 
 
 if __name__ == "__main__":
