@@ -99,7 +99,7 @@ def main(save_every: int, total_epochs: int, batch_size: int, snapshot_path: str
     ddp_setup(local_rank)
     dataset, model, optimizer = load_train_objs()
     train_data = prepare_dataloader(dataset, batch_size)
-    trainer = Trainer(model, train_data, optimizer, save_every, snapshot_path)
+    trainer = Trainer(model, train_data, optimizer, local_rank, save_every, snapshot_path)
     trainer.train(total_epochs)
     destroy_process_group()
     if local_rank == 0:
