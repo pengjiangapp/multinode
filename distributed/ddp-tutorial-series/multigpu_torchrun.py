@@ -113,5 +113,11 @@ if __name__ == "__main__":
     parser.add_argument('--save_every', type=int, help='How often to save a snapshot')
     parser.add_argument('--batch_size', default=32, type=int, help='Input batch size on each device (default: 32)')
     args = parser.parse_args()
-    
+    import sys
+
+    # Print the version of Python
+    print("Python version")
+    print(sys.version)
+    print("Version info.")
+    print(sys.version_info)
     main(args.save_every, args.total_epochs, args.batch_size)
