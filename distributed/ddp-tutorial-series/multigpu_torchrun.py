@@ -94,9 +94,20 @@ def prepare_dataloader(dataset: Dataset, batch_size: int):
 def post_training():
     print("===after training, lets do post processing====")
 
+def pre_training():
+    import sys
+
+    # Print the version of Python
+    print("Python version")
+    print(sys.version)
+    print("Version info.")
+    print(sys.version_info)
+
 def main(save_every: int, total_epochs: int, batch_size: int, snapshot_path: str = "snapshot.pt"):
     local_rank = int(os.environ["LOCAL_RANK"])
     ddp_setup(local_rank)
+    if local_rank == 0:
+        pre_training()
     dataset, model, optimizer = load_train_objs()
     train_data = prepare_dataloader(dataset, batch_size)
     trainer = Trainer(model, train_data, optimizer, local_rank, save_every, snapshot_path)
@@ -113,11 +124,5 @@ if __name__ == "__main__":
     parser.add_argument('--save_every', type=int, help='How often to save a snapshot')
     parser.add_argument('--batch_size', default=32, type=int, help='Input batch size on each device (default: 32)')
     args = parser.parse_args()
-    import sys
 
-    # Print the version of Python
-    print("Python version")
-    print(sys.version)
-    print("Version info.")
-    print(sys.version_info)
     main(args.save_every, args.total_epochs, args.batch_size)
