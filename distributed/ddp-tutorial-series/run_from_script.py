@@ -8,5 +8,7 @@ if __name__ == "__main__":
 
     mode = args.mode
     if mode == 'multigpu':
-        os.system("torchrun --standalone --nproc_per_node=4 distributed/ddp-tutorial-series/multigpu_torchrun.py  --total_epochs=50 --save_every=10 --batch_size=32")
+        command = "torchrun --standalone --nproc_per_node=4 distributed/ddp-tutorial-series/multigpu_torchrun.py  --total_epochs=50 --save_every=10 --batch_size=32"
+        print(f"====running command: {command}===")
+        os.system(command)
     print("===finish training job===")
