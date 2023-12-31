@@ -126,3 +126,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     main(args.save_every, args.total_epochs, args.batch_size)
+
+
+#  torchrun --standalone --nproc_per_node=4 distributed/ddp-tutorial-series/multigpu_torchrun.py  --total_epochs=50 --save_every=10 --batch_size=32
